@@ -29,6 +29,13 @@ local kube = import "kube.libsonnet";
   deploy: kube.Deployment($.p+"external-dns") + $.namespace {
     spec+: {
       template+: {
+        metadata+: {
+          annotations+: {
+            "prometheus.io/scrape": "true",
+            "prometheus.io/port": "7979",
+            "prometheus.io/path": "/metrics",
+          },
+        },
         spec+: {
           serviceAccountName: $.sa.metadata.name,
           containers_+: {
@@ -39,6 +46,13 @@ local kube = import "kube.libsonnet";
                 //"domain-filter": "example.com",
               },
               args+: ["--source=%s" % s for s in self.args_.sources_],
+              ports_+: {
+                metrics: {containerPort: 7979},
+              },
+              readinessProbe: {
+                httpGet: {path: "/healthz", port: "metrics"},
+              },
+              livenessProbe: self.readinessProbe,
             },
           },
         },
