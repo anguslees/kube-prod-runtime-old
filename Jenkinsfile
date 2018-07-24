@@ -129,11 +129,10 @@ containers: [
               unstash 'src'
 
               sh 'apt-get -qy update && apt-get -qy install make'
-              // TODO: use tool, once the next release is made
-              sh 'go get github.com/ksonnet/kubecfg'
 
               dir('manifests') {
-                sh 'make validate KUBECFG="kubecfg -v"'
+                def kubecfg = "${tool 'kubecfg'}/kubecfg"
+                sh "make validate KUBECFG='${kubecfg} -v'"
               }
               stash includes: 'manifests/**', excludes: 'manifests/Makefile', name: 'manifests'
             }
