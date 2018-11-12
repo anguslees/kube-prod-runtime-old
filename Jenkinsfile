@@ -51,7 +51,7 @@ def runIntegrationTest(String description, String kubeprodArgs, String ginkgoArg
                 // to do that via some sort of custom jsonnet overlay,
                 // since power users will want similar flexibility.
 
-                sh "./bin/kubeprod -v=1 install aks --manifests=manifests --config=kubeprod-autogen.json ${kubeprodArgs}"
+                sh "./bin/kubeprod -v=1 install aks --config=kubeprod-autogen.json ${kubeprodArgs}"
 
                 // Wait for deployments to rollout before we start the integration tests
                 try {
@@ -147,7 +147,7 @@ spec:
                 withGo() {
                     withEnv(["PATH+JQ=${tool 'jq'}"]) {
                         withCredentials([usernamePassword(credentialsId: 'github-bitnami-bot', passwordVariable: 'GITHUB_TOKEN', usernameVariable: '')]) {
-                            sh "make release-notes VERSION=${env.TAG_NAME}"
+                            sh "make release-notes VERSION=${TAG_NAME} GIT_TAG=${TAG_NAME}"
                         }
                         stash includes: 'Release_Notes.md', name: 'release-notes'
                     }
@@ -346,10 +346,10 @@ az account set -s $AZURE_SUBSCRIPTION_ID
                             unstash 'src'
                             unstash 'release-notes'
 
-                            sh "make dist VERSION=${env.TAG_NAME}"
+                            sh "make dist VERSION=${TAG_NAME} GIT_TAG=${TAG_NAME}"
 
                             withCredentials([usernamePassword(credentialsId: 'github-bitnami-bot', passwordVariable: 'GITHUB_TOKEN', usernameVariable: '')]) {
-                                sh "make publish VERSION=${env.TAG_NAME}"
+                                sh "make publish VERSION=${TAG_NAME} GIT_TAG=${TAG_NAME}"
                             }
                         }
                     }

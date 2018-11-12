@@ -35,10 +35,13 @@ import (
 	_ "github.com/bitnami/kube-prod-runtime/kubeprod/pkg/gke"
 )
 
+// Overridden at link time by Makefile.
 var version = "(dev build)"
+var gitTag = "master"
 
 func main() {
 	cmd.Version = version
+	cmd.GitTag = gitTag
 
 	if err := cmd.RootCmd.Execute(); err != nil {
 		// PersistentPreRunE may not have been run for early

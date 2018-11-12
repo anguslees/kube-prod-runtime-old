@@ -31,11 +31,13 @@ import (
 )
 
 const (
-	FlagManifests       = "manifests"
-	DefaultManifestBase = "https://github.com/bitnami/kube-prod-runtime/manifests/"
+	FlagManifests          = "manifests"
+	DefaultManifestBaseFmt = "https://github.com/bitnami/kube-prod-runtime/raw/%s/manifests/"
 
 	FlagPlatformConfig = "config"
 )
+
+var GitTag = "master"
 
 var InstallCmd = &cobra.Command{
 	Use:   "install",
@@ -43,10 +45,14 @@ var InstallCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 }
 
+func DefaultManifestBase() string {
+	return fmt.Sprintf(DefaultManifestBaseFmt, GitTag)
+}
+
 func init() {
 	RootCmd.AddCommand(InstallCmd)
 
-	InstallCmd.PersistentFlags().String(FlagManifests, DefaultManifestBase, "Base URL below which to find platform manifests")
+	InstallCmd.PersistentFlags().String(FlagManifests, DefaultManifestBase(), "Base URL below which to find platform manifests")
 	InstallCmd.PersistentFlags().String(FlagPlatformConfig, prodruntime.DefaultPlatformConfig, "Path for generated platform config file")
 }
 
